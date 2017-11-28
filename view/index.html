@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.2/react.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/15.6.2/react-dom.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script type="text/babel">
+			var TwitterFeeds = React.createClass({
+				getInitialState: function() {
+					return {
+						tweets : []
+					}
+				}, 
+				componentDidMount: function() {			
+					$.ajax({
+					  url: 'http://127.0.0.1:3000/getTweets',
+					  dataType: 'json',
+					  cache: false,
+					  success: function(data) {
+					    var sortedTweets = data.sort(function(a,b) {return (a.created_at > b.created_at) ? 1 : ((b.created_at > a.created_at) ? -1 : 0);} );
+						this.setState({tweets: sortedTweets});
+					  }.bind(this),
+					  error: function(xhr, status, err) {
+						console.error('API call failed', status, err.toString());
+					  }.bind(this)
+					});
+				},
+				render: function () {
+					var twitterFeeds = this.state.tweets.map(function(item) {
+						return (<tr key={item.id}>
+									<td>{item.text}</td>
+									<td>{item.created_at}</td>
+									<td>{item.user}</td>
+								</tr>);
+					});
+					return (
+						<table>
+							<tr><td width="300px">Tweet</td><td>Date/Time</td><td>User</td></tr>
+							{twitterFeeds}
+						</table>
+					);
+				}
+			});
+
+			ReactDOM.render(
+				<TwitterFeeds/>, document.getElementById('root')
+			);
+		</script>
+	</head>
+	<body>
+		<div id="root"/>
+	</body>
+</html>
