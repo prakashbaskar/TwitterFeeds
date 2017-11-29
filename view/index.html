@@ -4,12 +4,7 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/15.6.2/react-dom.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-		<script src="https://unpkg.com/react-table@latest/react-table.js"></script>
 		<link rel="stylesheet" href="./style.css">
-		<link rel="stylesheet" href="https://unpkg.com/react-table@latest/react-table.css">
-		<script>
-			var ReactTable = window.ReactTable.default
-		</script> 
 
 		<script type="text/babel">
 			var TwitterFeeds = React.createClass({
@@ -19,12 +14,15 @@
 					}
 				}, 
 				componentDidMount: function() {			
+					// Invoke APi route to get twitter feed data.
 					$.ajax({
 					  url: 'http://127.0.0.1:9000/getTweets',
 					  dataType: 'json',
 					  cache: false,
 					  success: function(data) {
-					    var sortedTweets = data.sort(function(a,b) {return (a.created_at > b.created_at) ? 1 : ((b.created_at > a.created_at) ? -1 : 0);} );
+						// Sort the feed data in chronological order based on date/time.
+						var sortedTweets = data.sort(function(a,b) {return (a.created_at > b.created_at) ? 1 : ((b.created_at > a.created_at) ? -1 : 0);} );
+						// Save the sorted tweets in the state.
 						this.setState({tweets: sortedTweets});
 					  }.bind(this),
 					  error: function(xhr, status, err) {
@@ -33,13 +31,6 @@
 					});
 				},
 				render: function () {
-					var twitterFeeds = this.state.tweets.map(function(item) {
-						return (<tr key={item.id}>
-											<td>{item.text}</td>
-											<td>{item.created_at}</td>
-											<td>{item.user}</td>
-								   </tr>);
-					});
 					var twitterGridFeeds = this.state.tweets.map(function(item) {
 						return (<div className="row" key={item.id}>
 									<div className="col-1-2">{item.text}</div>
@@ -47,45 +38,22 @@
 									<div className="col-1-4">{item.user}</div>
 								   </div>);
 					});					
-					const columns = [{
-    				Header: 'Tweet',
-						accessor: 'text',
-						width: 400
-  				}, {
-    				Header: 'User',
-						accessor: 'user',
-						width: 150
-  				}];
 					return (
 							<div>
 								<div className="wrapper">
 									<div className="row">
-      									<div className="col-1-2">
-        									<h3>Tweet</h3>
+      									<div className="header-1-2">
+        									<h3>Tweets</h3>
 										</div>
-										<div className="col-1-4">
+										<div className="header-1-4">
         									<h3>Created</h3>
 										</div>
-										<div className="col-1-4">
+										<div className="header-1-4">
         									<h3>User</h3>
 										</div>																				
 									</div>
 									{twitterGridFeeds}
 								</div>
-								<br/>
-								<ReactTable
-									data={this.state.tweets}
-									columns={columns}
-									defaultPageSize={20}
-									showPagination={false}
-									className="-striped -highlight"
-									width="300px"
-								/>
-								<br/>
-								<table>
-									<tr><td width="300px">Tweet</td><td>Date/Time</td><td>User</td></tr>
-									{twitterFeeds}
-								</table>
 						</div>
 					);
 				}
